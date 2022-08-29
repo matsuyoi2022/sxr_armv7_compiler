@@ -1,0 +1,5 @@
+test/llvm_ir
+test/xr
+test/arm
+.vscode/
+out/
