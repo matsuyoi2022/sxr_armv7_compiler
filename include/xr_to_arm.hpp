@@ -44,7 +44,6 @@ void xr_to_arm(string& xr_in, string& arm_out) {
                     for (int j = i+1; j < line.length(); j++) {
                         if (line[j] < '0' or line[j] > '9') {
                             reg_name = line.substr(i, j - i);
-                            cout << reg_name << endl;
                             (xr_func_now.xr_reg_set).insert(reg_name);
                             // Jump out if we find the end of the reg.
                             break;
@@ -53,7 +52,6 @@ void xr_to_arm(string& xr_in, string& arm_out) {
                 }
             }
         }
-        
         line_no ++;
     }
 
