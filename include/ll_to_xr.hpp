@@ -31,8 +31,8 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             // out << "func_end" << endl;
         }
         else if(regex_search(line, ll_def)) {
-            unsigned int begin_loc = line.find(" @") + 2;
-            unsigned int end_loc = line.find("()") - 1;
+            int begin_loc = line.find(" @") + 2;
+            int end_loc = line.find("()") - 1;
             func_name = line.substr(begin_loc, end_loc - begin_loc  + 1);
             out << func_name << ":" << endl;
         }
@@ -40,16 +40,16 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             out << "  bx lr" << endl;
         }
         else if(regex_search(line, ll_call)) {
-            unsigned int begin_loc = line.find(" @") + 2;
-            unsigned int end_loc = line.find("()") - 1;
+            int begin_loc = line.find(" @") + 2;
+            int end_loc = line.find("()") - 1;
             func_name = line.substr(begin_loc, end_loc - begin_loc + 1);
             out << "  bl " << func_name << endl;
         }
         else if(!regex_search(line, ll_alloca)) {
             string new_line;
-            unsigned int align_loc = line.find(", align 4");
-            unsigned int i32p_loc = line.find("i32*");
-            unsigned int i32_loc = line.find("i32");
+            int align_loc = line.find(", align 4");
+            int i32p_loc = line.find("i32*");
+            int i32_loc = line.find("i32");
             new_line = line.replace(align_loc, 10, "");
             new_line = new_line.replace(i32p_loc, 5, "");
             new_line = new_line.replace(i32_loc, 4, "");
