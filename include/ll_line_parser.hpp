@@ -19,6 +19,7 @@ string to_reg(string ll_reg) {
 // Turn an llvm ir line to an xr line.
 void ll_line_parser(string& line) {
     vector<string> ll_line_split;
+    regex arith("(add)|(sub)|(mul)|(sdiv)|(and)|(or)");
     if (line.find("store") != line.npos) {
         string_split(line, " ", ll_line_split);
         string ll_rd = ll_line_split[2];
@@ -31,12 +32,17 @@ void ll_line_parser(string& line) {
         string ll_op2 = ll_line_split[4];
         line = "  mov " + to_reg(ll_rd) + ", " + to_reg(ll_op2);
     }
-    else if (line.find("add") != line.npos) {
+    else if (regex_search(line, arith)) {
         string_split(line, " ", ll_line_split);
+        string ll_arith = ll_line_split[2];
         string ll_rd = ll_line_split[0];
         string ll_rn = ll_line_split[3];
         string ll_op2 = ll_line_split[4];
-        line = "  add " + to_reg(ll_rd) + ", " + to_reg(ll_rn) + ", " + to_reg(ll_op2);
+        if (ll_arith == "or") {
+            ll_arith = "orr";
+        }
+        line = "  " + ll_arith + " " + to_reg(ll_rd) + ", " + to_reg(ll_rn)
+                + ", " + to_reg(ll_op2);
     }
 }
 #endif
