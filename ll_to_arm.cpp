@@ -1,6 +1,8 @@
+#include <iostream>
 #include "include/ll_to_xr.hpp"
 #include "include/xr_to_arm.hpp"
 #include "include/xr_to_arm.hpp"
+using namespace std;
 
 int main(int argc, char *argv[]) {
     string ll_in = argv[1];
