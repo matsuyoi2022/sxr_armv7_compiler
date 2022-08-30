@@ -12,10 +12,11 @@ void ll_to_xr(string& ll_in, string& xr_out) {
     regex ll_content("[:graph:]|}");
     regex ll_no_use("^(!|;|s|t|a)");
     regex ll_func_end("}");
-    regex ll_alloca("[[:print:]]*%[[:print:]]*alloca[[:print:]]*");
+    regex ll_mov("(store)|(load)");
     regex ll_def("define dso_local");
     regex ll_ret("[[:blank:]]*ret");
     regex ll_call("= call ");
+    regex ll_add("add");
     
     string line;
     string func_name;
@@ -45,7 +46,7 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             func_name = line.substr(begin_loc, end_loc - begin_loc + 1);
             out << "  bl " << func_name << endl;
         }
-        else if(!regex_search(line, ll_alloca)) {
+        else if(regex_search(line, ll_mov)) {
             string new_line;
             int align_loc = line.find(", align 4");
             int i32p_loc = line.find("i32*");
@@ -54,6 +55,14 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             new_line = new_line.replace(i32p_loc, 5, "");
             new_line = new_line.replace(i32_loc, 4, "");
             new_line = new_line.substr(2);
+            ll_line_parser(new_line);
+            out << new_line << endl;
+        }
+        else if (regex_search(line, ll_add)) {
+            string new_line;
+            int nsw_loc = line.find("nsw i32");
+            new_line = line.replace(nsw_loc, 8, "");
+            new_line = line.substr(2);
             ll_line_parser(new_line);
             out << new_line << endl;
         }

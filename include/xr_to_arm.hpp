@@ -64,8 +64,16 @@ void xr_to_arm(string& xr_in, string& arm_out) {
         string &before_end_line = xr_lines[f.end_line - 1];
         vector<string> xr_line_split;
         string_split(before_end_line, " ", xr_line_split);
-        string xr_op2 = xr_line_split[4];
-        before_end_line = "  " + xr_line_split[2] + " #0, " + xr_op2;
+        if (xr_line_split.size() == 5) {
+            string xr_op2 = xr_line_split[4];
+            before_end_line = "  " + xr_line_split[2] + " #0, " + xr_op2;
+        }
+        else if (xr_line_split.size() == 6) {
+            string xr_rn = xr_line_split[4];
+            string xr_op2 = xr_line_split[5];
+            before_end_line = "  " + xr_line_split[2] + " #0, " + xr_rn
+            + " " + xr_op2;
+        }
     }
     
     for (auto l : xr_lines) {
