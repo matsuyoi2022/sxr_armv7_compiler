@@ -4,80 +4,51 @@
 #include <regex>
 #include <set>
 #include "string_split.hpp"
+#include "class_xr_line.hpp"
+#include "class_arm_func.hpp"
 using namespace std;
-
-struct Func
-{
-    string func_name;
-    int begin_line;
-    int end_line;
-    set<string> xr_reg_set;
-};
 
 void xr_to_arm(string& xr_in, string& arm_out) {
     ifstream in(xr_in);
     ofstream out(arm_out);
 
-    regex xr_func_name(":$");
-    regex xr_ret("^  bx");
+    regex xr_func_name("[[:alpha:]][[:graph:]]*:");
+    regex xr_bx("^  bx");
+    regex xr_bl("^  bl");
     regex xr_reg("#[[:digit:]]*");
+    regex xr_global("^.global");
 
     string line;
-    int line_no = 0;
-    vector<Func> funcs;
-    vector<string> xr_lines;
+    vector<ArmFunc> funcs;
     while (getline(in, line)) {
-        xr_lines.push_back(line);       
+        XrLine xr_line_now(line);
+        string xr_content = xr_line_now.get_content();
         if (regex_search(line, xr_func_name)) {
-            // {} means an empty set.
-            funcs.push_back({line, line_no, 0, {}});
+            string func_name = xr_line_now.get_func_name();
+            vector<int> xr_params = xr_line_now.get_func_params();
+            funcs.push_back(ArmFunc(func_name));
+            (funcs.back()).set_arm_func_name(func_name);
+            XrLine new_line(xr_line_now.get_func_name() + ":");
+            (funcs.back()).push_xr_line(new_line);
         }
-        else if (regex_search(line, xr_ret)) {
-            Func &xr_func_now = funcs.back();
-            xr_func_now.end_line = line_no;
+        else if (regex_search(line, xr_bx)) {
+            (funcs.back()).push_xr_line(xr_line_now);
+        }
+        else if (regex_search(line, xr_bl)) {
+            XrLine push_line("  push {lr}");
+            XrLine pop_line("  pop {lr}");
+            XrLine new_line("  bl " + xr_line_now.get_called_name());
+            (funcs.back()).push_xr_line(push_line);
+            (funcs.back()).push_xr_line(new_line);
+            (funcs.back()).push_xr_line(pop_line);
         }
         else if (regex_search(line, xr_reg)) {
-            string reg_name;
-            Func &xr_func_now = funcs.back();
-            for (int i = 0; i < line.length(); i++){
-                if (line[i] == '#') {
-                    for (int j = i+1; j < line.length(); j++) {
-                        if (line[j] < '0' or line[j] > '9') {
-                            reg_name = line.substr(i, j - i);
-                            (xr_func_now.xr_reg_set).insert(reg_name);
-                            // Jump out if we find the end of the reg.
-                            break;
-                        }
-                    }
-                }
-            }
+            (funcs.back()).push_xr_line(xr_line_now);
         }
-        line_no ++;
     }
 
-    for (auto f : funcs) {
-        cout << f.func_name << " " << f.begin_line
-        << " " << f.end_line << " " << (f.xr_reg_set).size() << endl;
-    }
-
-    for (auto f : funcs) {
-        string &before_end_line = xr_lines[f.end_line - 1];
-        vector<string> xr_line_split;
-        string_split(before_end_line, " ", xr_line_split);
-        if (xr_line_split.size() == 5) {
-            string xr_op2 = xr_line_split[4];
-            before_end_line = "  " + xr_line_split[2] + " #0, " + xr_op2;
-        }
-        else if (xr_line_split.size() == 6) {
-            string xr_rn = xr_line_split[4];
-            string xr_op2 = xr_line_split[5];
-            before_end_line = "  " + xr_line_split[2] + " #0, " + xr_rn
-            + " " + xr_op2;
-        }
-    }
-    
-    for (auto l : xr_lines) {
-        out << l << endl;
+    for (auto i : funcs) {
+        i.out_xr_lines(out);
     }
 }
 #endif

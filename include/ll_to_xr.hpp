@@ -2,7 +2,8 @@
 #define LL_TO_XR_HPP
 #include <fstream>
 #include <regex>
-#include "ll_line_parser.hpp"
+#include "ll_line_to_xr.hpp"
+#include "ll_auxiliary.hpp"
 using namespace std;
 
 void ll_to_xr(string& ll_in, string& xr_out) {
@@ -20,8 +21,7 @@ void ll_to_xr(string& ll_in, string& xr_out) {
     regex ll_arith("(add)|(sub)|(mul)|(sdiv)|(and)|(or)");
     
     string line;
-    string func_name;
-    out << ".global main" << endl;
+    // out << ".global main" << endl;
     while (getline(in, line)) {
         if (!regex_search(line, ll_content)) {
             ;
@@ -33,19 +33,38 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             ;
         }
         else if (regex_search(line, ll_def)) {
-            int begin_loc = line.find(" @") + 2;
-            int end_loc = line.find("()") - 1;
-            func_name = line.substr(begin_loc, end_loc - begin_loc  + 1);
-            out << func_name << ":" << endl;
+            int func_end_loc = line.find("(") - 1;
+            int param_end_loc = line.find(")") - 1;
+            int params_len = param_end_loc - func_end_loc - 1;
+            string func_name = ll_func_name_to_xr(line.substr(0, func_end_loc + 1));
+            if (params_len > 0) {
+                string ll_params = line.substr(func_end_loc + 2, params_len);
+                string xr_params = ll_params_to_xr(ll_params);
+                out << func_name << ": " << xr_params << endl;
+            }
+            else {
+                out << func_name << ":" << endl;
+            }
         }
         else if (regex_search(line, ll_ret)) {
             out << "  bx lr" << endl;
         }
         else if (regex_search(line, ll_call)) {
-            int begin_loc = line.find(" @") + 2;
-            int end_loc = line.find("()") - 1;
-            func_name = line.substr(begin_loc, end_loc - begin_loc + 1);
-            out << "  bl " << func_name << endl;
+            int func_end_loc = line.find("(") - 1;
+            int param_end_loc = line.find(")") - 1;
+            int params_len = param_end_loc - func_end_loc - 1;
+            int equal_loc = line.find("=");
+            string func_name = ll_func_name_to_xr(line.substr(0, func_end_loc + 1));
+            string target_reg = ll_field_to_xr(line.substr(2, equal_loc + 1));
+            if (params_len > 0) {
+                string ll_params = line.substr(func_end_loc + 2, params_len);
+                string xr_params = ll_params_to_xr(ll_params);
+                out << "  bl @" << func_name << "(" << xr_params << ")" <<
+                 " -> " << target_reg <<endl;
+            }
+            else {
+                out << "  bl @" << func_name << " ->" << target_reg << endl;
+            }
         }
         else if(regex_search(line, ll_mov)) {
             string new_line;
@@ -56,7 +75,7 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             new_line = new_line.replace(i32p_loc, 5, "");
             new_line = new_line.replace(i32_loc, 4, "");
             new_line = new_line.substr(2);
-            ll_line_parser(new_line);
+            ll_line_to_xr(new_line);
             out << new_line << endl;
         }
         else if (regex_search(line, ll_arith)) {
@@ -71,7 +90,7 @@ void ll_to_xr(string& ll_in, string& xr_out) {
                 new_line = line.replace(i32_loc, 4, "");
             }
             new_line = line.substr(2);
-            ll_line_parser(new_line);
+            ll_line_to_xr(new_line);
             out << new_line << endl;
         }
     }
