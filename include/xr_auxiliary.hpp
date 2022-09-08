@@ -35,10 +35,24 @@ int get_init_rn(vector<string> xr_line_split) {
     return res;
 }
 
-// Get the initial op2 of an xr line.
-int get_init_op2(vector<string> xr_line_split) {
+// Get the initial op2 of a 4 field xr line.
+int get_init_4_op2(vector<string> xr_line_split) {
     int res = INT32_MAX;
     string xr_op2 = xr_line_split[5];
+    // Op2 will be a register if the field is begin with "#".
+    if (xr_op2[0] == '#') {
+        res = atoi((xr_op2.substr(1)).c_str());
+    }
+    else {
+        res = atoi(xr_op2.c_str());
+    }
+    return res;
+}
+
+// Get the initial op2 of a 3 field xr line.
+int get_init_3_op2(vector<string> xr_line_split) {
+    int res = INT32_MAX;
+    string xr_op2 = xr_line_split[4];
     // Op2 will be a register if the field is begin with "#".
     if (xr_op2[0] == '#') {
         res = atoi((xr_op2.substr(1)).c_str());
@@ -58,6 +72,7 @@ string get_init_func_name(string input) {
 
 // Get the initial label called in a bl line.
 string get_init_bl_label(string input) {
+    cout << input << endl; // zpw
     int bl_begin_loc = input.find("bl") + 4;
     int bl_end_loc = input.find("(") - 1;
     int label_name_len = bl_end_loc - bl_begin_loc + 1;

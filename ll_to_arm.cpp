@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char *argv[]) {
     string ll_in = argv[1];
     int parent_pos = ll_in.find("llvm_ir") + 8;
-    string file_body = ll_in.substr(parent_pos, ll_in.find(".") - parent_pos);
+    string file_body = ll_in.substr(parent_pos, ll_in.find(".ll") - parent_pos);
     string xr_suff = ".xr.s";
     string arm_suff = ".s";
     string xr_pref = "test/xr/";

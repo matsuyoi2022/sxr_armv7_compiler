@@ -5,6 +5,8 @@
 #define ARITHI 21
 #define BL 3
 #define BX 4
+#define PUSH 5
+#define POP 6
 #include <fstream>
 #include "class_xr_line.hpp"
 #include "string_split.hpp"
@@ -20,6 +22,7 @@ XrLine::XrLine(string content) {
     this->op2_ = INT32_MAX;
     func_params_ = {};
     bl_params_ = {};
+    this->init_line(content);
 }
 
 // Get the content of an xr or arm line.
@@ -74,7 +77,7 @@ void XrLine::init_line(string input) {
         this->opcode_ = xr_line_split[2];
         this->rd_ = get_init_rd(xr_line_split);
         this->rn_ = get_init_rn(xr_line_split);
-        this->op2_ = get_init_op2(xr_line_split);
+        this->op2_ = get_init_4_op2(xr_line_split);
     }
     else if (xr_line_split[2] == "mov") {
         string op2 = xr_line_split[4];
@@ -86,7 +89,7 @@ void XrLine::init_line(string input) {
         }
         this->opcode_ = "mov";
         this->rd_ = get_init_rd(xr_line_split);
-        this->op2_ = get_init_op2(xr_line_split);
+        this->op2_ = get_init_3_op2(xr_line_split);
     }
     else if (xr_line_split[2] == "bl") {
         res = BL;
@@ -97,6 +100,14 @@ void XrLine::init_line(string input) {
     else if (xr_line_split[2] == "bx") {
         res = BX;
         this->opcode_ = "bx";
+    }
+    else if (xr_line_split[2] == "push") {
+        res = PUSH;
+        this->opcode_ = "push";
+    }
+    else if (xr_line_split[2] == "pop") {
+        res = POP;
+        this->opcode_ = "pop";
     }
     this->line_type_ = res;
 }
@@ -115,11 +126,11 @@ void XrLine::out_line(ofstream& out) {
         res = "  " + opcode_ + " #" + to_string(rd_) + ", " + to_string(op2_);
     }
     else if (this->line_type_ == ARITHR) {
-        res = "  " + opcode_ + " #" + to_string(rd_) + ", " + to_string(rn_) +
+        res = "  " + opcode_ + " #" + to_string(rd_) + ", #" + to_string(rn_) +
               ", #" + to_string(op2_);
     }
     else if (this->line_type_ == ARITHI) {
-        res = "  " + opcode_ + " #" + to_string(rd_) + ", " + to_string(rn_) +
+        res = "  " + opcode_ + " #" + to_string(rd_) + ", #" + to_string(rn_) +
               ", " + to_string(op2_);
     }
     else if (this->line_type_ == BL) {
@@ -127,6 +138,9 @@ void XrLine::out_line(ofstream& out) {
     }
     else if (this->line_type_ == BX) {
         res = "  " + opcode_ + " lr";
+    }
+    else if (this->line_type_ == PUSH || this->line_type_ == POP) {
+        res = "  " + opcode_ + " {lr}";
     }
     out << res << endl;
 }

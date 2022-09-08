@@ -26,7 +26,7 @@ void xr_to_arm(string& xr_in, string& arm_out) {
         if (regex_search(line, xr_func_name)) {
             string func_name = xr_line_now.get_func_name();
             vector<int> xr_params = xr_line_now.get_func_params();
-            ArmFunc xr_func(func_name); // zpw
+            ArmFunc xr_func(func_name);
             funcs.push_back(xr_func);
             // (funcs.back()).set_arm_func_name(func_name);
             XrLine new_line(xr_line_now.get_func_name() + ":");
@@ -38,9 +38,8 @@ void xr_to_arm(string& xr_in, string& arm_out) {
         else if (regex_search(line, xr_bl)) {
             XrLine push_line("  push {lr}");
             XrLine pop_line("  pop {lr}");
-            XrLine new_line("  bl " + xr_line_now.get_bl_label());
             (funcs.back()).push_xr_line(push_line);
-            (funcs.back()).push_xr_line(new_line);
+            (funcs.back()).push_xr_line(xr_line_now);
             (funcs.back()).push_xr_line(pop_line);
         }
         else if (regex_search(line, xr_reg)) {
