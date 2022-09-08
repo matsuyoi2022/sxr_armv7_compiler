@@ -7,6 +7,7 @@ using namespace std;
 
 class XrLine {
     public:
+        XrLine();
         XrLine(string content);
         string get_content(void);
         void init_line(string input);
@@ -22,6 +23,7 @@ class XrLine {
         int rd_;
         int rn_;
         int op2_;
+        int exit_reg_;
         vector<int> func_params_;
         vector<int> bl_params_;
 };

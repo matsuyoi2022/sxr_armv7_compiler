@@ -12,7 +12,20 @@
 #include "string_split.hpp"
 #include "xr_auxiliary.hpp"
 
-// Initialize an XrLine object.
+// Initialize an empty XrLine.
+XrLine::XrLine() {
+    this->func_name_ = "!none_func";
+    this->label_ = "!none_label";
+    this->opcode_ = "!none_opcode";
+    this->rd_ = INT32_MAX;
+    this->rn_ = INT32_MAX;
+    this->op2_ = INT32_MAX;
+    this->exit_reg_ = INT32_MAX;
+    func_params_ = {};
+    bl_params_ = {};
+}
+
+// Initialize an XrLine object with content.
 XrLine::XrLine(string content) {
     this->func_name_ = "!none_func";
     this->label_ = "!none_label";
@@ -20,6 +33,7 @@ XrLine::XrLine(string content) {
     this->rd_ = INT32_MAX;
     this->rn_ = INT32_MAX;
     this->op2_ = INT32_MAX;
+    this->exit_reg_ = INT32_MAX;
     func_params_ = {};
     bl_params_ = {};
     this->init_line(content);
@@ -96,10 +110,12 @@ void XrLine::init_line(string input) {
         this->opcode_ = "bl";
         this->label_ = get_init_bl_label(input);
         this->bl_params_ = get_init_bl_params(input);
+        this->exit_reg_ = get_init_bl_exit(input);
     }
     else if (xr_line_split[2] == "bx") {
         res = BX;
         this->opcode_ = "bx";
+        this->exit_reg_ = get_init_bx_exit(input);
     }
     else if (xr_line_split[2] == "push") {
         res = PUSH;

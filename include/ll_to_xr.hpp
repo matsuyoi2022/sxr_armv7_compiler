@@ -47,7 +47,8 @@ void ll_to_xr(string& ll_in, string& xr_out) {
             }
         }
         else if (regex_search(line, ll_ret)) {
-            out << "  bx lr" << endl;
+            int exit_loc = line.find("ret i32") + 9;
+            out << "  bx #" << line.substr(exit_loc) << endl;
         }
         else if (regex_search(line, ll_call)) {
             int func_end_loc = line.find("(") - 1;

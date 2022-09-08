@@ -72,7 +72,6 @@ string get_init_func_name(string input) {
 
 // Get the initial label called in a bl line.
 string get_init_bl_label(string input) {
-    cout << input << endl; // zpw
     int bl_begin_loc = input.find("bl") + 4;
     int bl_end_loc = input.find("(") - 1;
     int label_name_len = bl_end_loc - bl_begin_loc + 1;
@@ -108,6 +107,24 @@ vector<int> get_init_bl_params(string input) {
     else {
         res = {};
     }
+    return res;
+}
+
+// Get the exit register of a bl line.
+int get_init_bl_exit(string input) {
+    int res = INT32_MAX;
+    int arrow_loc = input.find("->");
+    string exit_reg = input.substr(arrow_loc + 4);
+    res = atoi(exit_reg.c_str());
+    return res;
+}
+
+// Get the exit register of a bx line.
+int get_init_bx_exit(string input) {
+    int res = INT32_MAX;
+    int reg_loc = input.find("#");
+    string exit_reg = input.substr(reg_loc + 1);
+    res = atoi(exit_reg.c_str());
     return res;
 }
 
