@@ -36,6 +36,4 @@ void ArmFunc::out_xr_lines(ofstream& out) {
 // Append an xr line..
 void ArmFunc::push_xr_line(XrLine xr_line) {
     (this->xr_arm_lines_).push_back(xr_line);
-    // cout << xr_line.get_content() << "NOOO" << endl; // zpw OK
-    // cout << ((this->xr_arm_lines_).back()).get_content() << "///" << endl; // zpw OK
 }
