@@ -1,12 +1,3 @@
-#define FUNC 0
-#define MOVR 10
-#define MOVI 11
-#define ARITHR 20
-#define ARITHI 21
-#define BL 3
-#define BX 4
-#define PUSH 5
-#define POP 6
 #include <fstream>
 #include "class_xr_line.hpp"
 #include "string_split.hpp"
@@ -159,6 +150,31 @@ void XrLine::out_line(ofstream& out) {
         res = "  " + opcode_ + " {lr}";
     }
     out << res << endl;
+}
+
+// Get the rd field of the line.
+int XrLine::get_line_type(void) {
+    return this->line_type_;
+}
+
+// Get the rd field of the line.
+int XrLine::get_rd(void) {
+    return this->rd_;
+}
+
+// Get the rn field of the line.
+int XrLine::get_rn(void) {
+    return this->rn_;
+}
+
+// Get the op2 field of the line.
+int XrLine::get_op2(void) {
+    return this->op2_;
+}
+
+// Get the exit register of the line.
+int XrLine::get_exit_reg(void) {
+    return this->exit_reg_;
 }
 
 // Get the name of the function.

@@ -41,4 +41,6 @@ void ArmFunc::push_xr_line(XrLine xr_line) {
 // Get the exit register of the function.
 int ArmFunc::get_exit(void) {
     XrLine last_line = (this->xr_arm_lines_).back();
+    int res = last_line.get_exit_reg();
+    return res;
 }

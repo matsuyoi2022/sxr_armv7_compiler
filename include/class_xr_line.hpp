@@ -1,5 +1,14 @@
 #ifndef CLASS_XR_LINE_HPP
 #define CLASS_XR_LINE_HPP
+#define FUNC 0
+#define MOVR 10
+#define MOVI 11
+#define ARITHR 20
+#define ARITHI 21
+#define BL 3
+#define BX 4
+#define PUSH 5
+#define POP 6
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -9,9 +18,14 @@ class XrLine {
     public:
         XrLine();
         XrLine(string content);
-        string get_content(void);
         void init_line(string input);
         void out_line(ofstream& out);
+        string get_content(void);
+        int get_line_type(void);
+        int get_rd(void);
+        int get_rn(void);
+        int get_op2(void);
+        int get_exit_reg(void);
         string get_func_name(void);
         string get_bl_label(void);
         vector<int> get_func_params(void);
